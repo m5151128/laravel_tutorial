@@ -1,0 +1,38 @@
+# PostgreSQL
+
+- name: repo install.
+  yum: name=https://s3-ap-northeast-1.amazonaws.com/sen-infra/rpms/centos/7/x86_64/pgdg-centos96-9.6-1.noarch.rpm
+
+- name: postgres install.
+  yum: name={{ item }} state=latest
+  with_items:
+    - postgresql96-server
+    - python-psycopg2
+
+- name: init db.
+  shell: /usr/pgsql-9.6/bin/postgresql96-setup initdb
+  ignore_errors: True
+  args:
+    creates: /var/lib/pgsql/9.6/data/postgresql.conf
+
+- name: start postgresql.
+  service: name=postgresql-9.6 state=started enabled=yes
+
+- name: create user.
+  postgresql_user:
+    name: "{{ postgresql.user_name }}"
+    password: "{{ postgresql.user_password }}"
+    role_attr_flags: LOGIN,CREATEDB,NOSUPERUSER
+  become_user: postgres
+  notify:
+    - postgresql restart
+
+- name: put postgresql.conf.
+  template: src=postgresql.conf.j2 dest=/var/lib/pgsql/9.6/data/postgresql.conf
+  notify:
+    - postgresql restart
+
+- name: put pg_hba.conf.
+  template: src=pg_hba.conf.j2 dest=/var/lib/pgsql/9.6/data/pg_hba.conf
+  notify:
+    - postgresql restart

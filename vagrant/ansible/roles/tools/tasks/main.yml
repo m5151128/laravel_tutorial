@@ -1,0 +1,2 @@
+- name: mkdir tools
+  file: path={{ home_dir }}/tools state=directory mode=0755 owner={{ service_account.user }} group={{ service_account.user }}

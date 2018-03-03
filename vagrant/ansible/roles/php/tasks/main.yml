@@ -1,0 +1,69 @@
+# php 7.2
+
+- name: install EPEL repo.
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+- name: import EPEL GPG key.
+  rpm_key:
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+    state: present
+
+- name: install remi repo.
+  yum:
+    name: http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+    state: present
+
+- name: import remi GPG key.
+  rpm_key:
+    key: http://rpms.remirepo.net/RPM-GPG-KEY-remi
+    state: present
+
+- name: install php7.2.
+  yum: pkg={{ item }} state=present enablerepo=remi,remi-php72
+  with_items:
+    - php
+    - php-opcache
+    - php-mbstring
+    - php-pdo
+    - php-pecl-memcache
+    - php-pecl-memcached
+    - php-pecl-redis
+    - php-pecl-imagick
+    - php-mcrypt
+    - php-mysqlnd
+    - php-xml
+    - php-gd
+    - php-devel
+    - php-gd
+    - php-pgsql
+    - php-pecl-ssh2
+    - php-process
+    - php-intl
+    - php-pear
+    - php-pecl-apcu
+    - php-fpm
+
+- name: check composer.
+  stat: path=/usr/local/bin/composer
+  register: composer_bin
+
+- block:
+  - name: download composer.
+    get_url:
+      url: https://getcomposer.org/installer
+      dest: /tmp/installer
+
+  - name: install composer.
+    shell: cat /tmp/installer | php -- --install-dir=/usr/local/bin
+
+  - name: rename composer.phar to composer.
+    shell: mv /usr/local/bin/composer.phar /usr/local/bin/composer
+
+  - name: make composer executable.
+    file:
+      path: /usr/local/bin/composer
+      mode: a+x
+      state: file
+
+  when: not composer_bin.stat.exists

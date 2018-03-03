@@ -1,0 +1,43 @@
+- name: original git exist check.
+  stat: path={{ bin_dir }}/git
+  register: exist_git
+
+- block:
+  - debug: msg="git not installed."
+  
+  - name: install dependences.
+    yum: name={{ item }}
+    with_items:
+      - curl-devel
+      - expat-devel
+      - gettext-devel
+      - openssl-devel
+      - zlib-devel
+      - gcc
+      - perl-ExtUtils-MakeMaker
+
+  - name: make download dir.
+    file: path={{ src_dir }} state=directory owner=root group=root mode=755
+    when: exist_git.stat.exists == false
+  
+  - name: download git version {{ version }}
+    unarchive:
+      src: https://www.kernel.org/pub/software/scm/git/git-{{ version }}.tar.gz
+      dest: "{{ src_dir }}"
+      copy: no
+
+  - name: make all.
+    make:
+      chdir: "{{ src_dir }}/git-{{ version }}"
+      target: all
+      params:
+        prefix: "{{ prefix_dir }}"
+
+  - name: make install.
+    make:
+      chdir: "{{ src_dir }}/git-{{ version }}"
+      target: install
+      params:
+        prefix: "{{ prefix_dir }}"
+
+  when: exist_git.stat.exists == false

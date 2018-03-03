@@ -1,0 +1,35 @@
+# nginx install
+
+- name: install nginx repo.
+  yum: name=http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+
+- name: disable default repo.
+  replace: dest=/etc/yum.repos.d/nginx.repo regexp="enabled *= *1" replace="enabled=0"
+
+- name: use mailline.
+  replace: dest=/etc/yum.repos.d/nginx.repo regexp="/packages/centos/" replace="/packages/mainline/centos/"
+
+- name: install nginx.
+  yum: name={{ item  }} enablerepo=nginx
+  with_items: 
+     - nginx
+
+- name: mkdir log. 
+  file: path={{ log_dir }}/nginx state=directory mode=0755 owner={{ service_account.user }} group={{ service_account.user }}
+
+- name: nginx conf setting.
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf backup=yes
+  notify:
+    - nginx restart
+
+- name: enable service nginx.
+  service: name=nginx enabled=yes
+
+- name: php-fpm conf setting.
+  template: src=php-fpm.www.conf.j2 dest=/etc/php-fpm.d/www.conf backup=yes
+
+- name: php-fpm service enable.
+  service: name=php-fpm enabled=yes
+
+- name: php-fpm service start.
+  service: name=php-fpm state=started

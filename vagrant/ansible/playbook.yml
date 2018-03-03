@@ -1,0 +1,18 @@
+- hosts: all
+  become: yes
+
+  vars:
+    service_account: { user: vagrant, domain: "lotochart.jp" }
+    synced_dir: "/home/vagrant/lotochart"
+    laravel_dir: "{{ synced_dir }}"
+    home_dir: "/home/{{ service_account.user }}"
+    log_dir: "{{ home_dir }}/log"
+    postgresql: { db_name: "localdb", user_name: "local", user_password: "local" }
+
+  roles:
+    - standard_commands
+    - git
+    - php
+    - nginx
+    - postgresql
+    - laravel

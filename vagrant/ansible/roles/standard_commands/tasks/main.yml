@@ -1,0 +1,14 @@
+# standard commands
+
+- name: yum install.
+  yum: name={{ item }} state=latest
+  with_items:
+    - zip
+    - unzip
+    - vim-enhanced
+    - ruby
+
+- name: gem install bundler.
+  gem:
+    name: bundler
+    user_install: no

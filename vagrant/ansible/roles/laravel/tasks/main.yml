@@ -1,0 +1,16 @@
+# composer
+
+- name: composer command install.
+  composer:
+    command: install
+    working_dir: "{{ laravel_dir }}"
+
+- name: bundler install.
+  bundler:
+    state: present
+    chdir: "{{ laravel_dir }}"
+    executable: /usr/local/bin/bundle
+    extra_args: --path vendor/bundle
+
+- name: set local .env.
+  template: src=env.local.j2 dest="{{ laravel_dir }}/.env"
