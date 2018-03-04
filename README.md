@@ -1,1 +1,1 @@
-# lotochart
+# e-go
