@@ -2,8 +2,8 @@
   become: yes
 
   vars:
-    service_account: { user: vagrant, domain: "e-go.jp" }
-    synced_dir: "/home/vagrant/e-go"
+    service_account: { user: vagrant, domain: "laravel_tutorial" }
+    synced_dir: "/home/vagrant/laravel_tutorial"
     laravel_dir: "{{ synced_dir }}"
     home_dir: "/home/{{ service_account.user }}"
     log_dir: "{{ home_dir }}/log"
