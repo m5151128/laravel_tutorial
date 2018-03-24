@@ -16,6 +16,7 @@ Route::get('foo', function () {
 });
 Route::get('foo/foo1', 'FooController@foo1');
 Route::get('foo/foo2', 'FooController@foo2');
+Route::get('foo/foo4', 'FooController@foo4');
 
 Route::get('/', 'ArticleController@index');
 Route::get('create', 'ArticleController@create');
